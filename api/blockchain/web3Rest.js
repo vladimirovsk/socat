@@ -1,5 +1,6 @@
-const  Web3 = require('web3');
-module.exports = class TransactionRest {
+import Web3 from 'web3';
+
+export default class TransactionRest {
 	web3
 	constructor() {
 		this.web3 = new Web3(new Web3.providers.HttpProvider(global.conf.uri));

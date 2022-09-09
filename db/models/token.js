@@ -1,7 +1,7 @@
-const Sequelize = require('sequelize');
+import Sequelize from 'sequelize';
 class Token extends Sequelize.Model {}
 
-module.exports = async (sequelize) => {
+export default async (sequelize) => {
     await Token.init({
             code: {type: Sequelize.STRING},
             token: {type: Sequelize.STRING},

@@ -1,7 +1,10 @@
-const express = require('express');
-const transactionRoute = require('./transaction.js');
+import express from 'express';
+import  transactionRoute from './transaction.js';
+
 const router = express.Router();
 
 router.use('/transaction' , transactionRoute);
 
-module.exports = router;
+export default router
+
+

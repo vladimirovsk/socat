@@ -1,9 +1,8 @@
 'use strict';
-const Sequelize = require('sequelize');
-const fs = require('fs');
-const path = require('path');
-
-let db = {}
+import { Sequelize } from 'sequelize';
+import tokenModel from './models/token.js'
+import conf from '../config.js';
+let db = {};
 
 const sequelize = new Sequelize(
 	conf.database.database,
@@ -23,23 +22,17 @@ const sequelize = new Sequelize(
 	}
 );
 
-fs.readdirSync(__dirname + '/models/').forEach(file => {
-	let model = require(path.join(__dirname + /models/, file))(sequelize, Sequelize);
-	db[model.name] = model;
-});
 
-Object.keys(db).forEach(modelName => {
-	if ('associate' in db[modelName]) {
-		db[modelName].associate(db);
-	}
-});
+const models = {
+	User: tokenModel(sequelize, Sequelize.DataTypes)
+}
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
-
+db.models = models;
 
 sequelize.sync({force: false});
 
-module.exports = db;
+export default db;
 
 

@@ -1,18 +1,23 @@
-const createError = require('http-errors');
-const express = require('express');
-const cors = require('cors');
-const router = require('./routes');
-const log4js = require('log4js');
-const normalizePort = require('normalize-port');
-const errorHandler = require('./middleware/errorHandler.js');
+import createError from 'http-errors';
+import express from 'express';
+import cors from 'cors';
+import router from './routes/index.js';
+import log4js from 'log4js';
+import conf from './config.js'
+import normalizePort from 'normalize-port';
+import errorHandler from './middleware/errorHandler.js';
+import * as mainApp from './api/app.js';
+import * as  db from './db/index.js'
+import * as bridge from './api/bridge/index.js';
 
-const http = require('http');
 
+import http from 'http';
 const app = express();
 const logger = log4js.getLogger('[SOCAT]');
 logger.level = process.env.LOG_LEVEL || 'debug';
 
-global.conf = require('./config');
+global.conf = conf;
+
 
 app.use(cors())
 app.use(express.json());
@@ -44,7 +49,5 @@ httpServer.on('error', function (err) {
 	logger.error('Error, created httpServer', err.message);
 });
 
-require('./api/app.js');
-require('./api/bridge/index.js');
-module.exports = app;
-global.db = require('./db')
+
+global.db = db;
