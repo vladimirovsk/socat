@@ -6,11 +6,7 @@ import log4js from 'log4js';
 import conf from './config.js'
 import normalizePort from 'normalize-port';
 import errorHandler from './middleware/errorHandler.js';
-import * as mainApp from './api/app.js';
 import * as  db from './db/index.js'
-import * as bridge from './api/bridge/index.js';
-
-
 import http from 'http';
 const app = express();
 const logger = log4js.getLogger('[SOCAT]');
