@@ -1,5 +1,8 @@
 const Web3WsProvider = require('web3-providers-ws');
 const Web3 = require('web3');
+const log4js = require('log4js');
+const logger = log4js.getLogger('[WEB3SOCKET]');
+logger.level = process.env.LOG_LEVEL || 'debug';
 
 module.exports = class TransactionSocket {
 	web3ws
@@ -10,29 +13,29 @@ module.exports = class TransactionSocket {
 		this.web3ws = new Web3(this.provider_ws);
 
 		this.provider_ws.on('error', err => {
-			console.log('WS Error', err);
+			logger.error('WS Error', err);
 			this.provider_ws = new Web3.providers.WebsocketProvider(global.conf.uri_wss);
 			this.web3ws.setProvider(this.provider_ws);
 		});
 
 		this.provider_ws.on('end', async () => {
-			console.log('WS closed');
-			console.log('Attempting to reconnect...');
+			logger.warn('WS closed');
+			logger.warn('Attempting to reconnect...');
 			this.provider_ws = new Web3.providers.WebsocketProvider(global.conf.uri_wss);
 			this.web3ws.setProvider(this.provider_ws);
 		});
 
 		this.provider_ws.on('connect', function () {
-			console.log('WSS connected');
+			logger.debug('WSS connected');
 		});
 	}
 
 	subscribeSync() {
 		this.web3ws.eth.subscribe('logs', async (err, res) => {
 			if (!err) {
-				console.log(res);
+				logger.log(res);
 			} else {
-				console.log(err)
+				logger.error(err)
 			}
 		});
 	}
@@ -42,7 +45,7 @@ module.exports = class TransactionSocket {
 			if (!err) {
 				this.web3ws.eth.getBlock(res.number).then(async block => {
 					if (block !== undefined) {
-						console.log('BLOCK:', res.number, 'Transaction:', block.transactions);
+						logger.log(`BLOCK: ${res.number} Transaction:  ${block.transactions}`);
 					}
 				});
 			}

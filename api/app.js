@@ -12,10 +12,8 @@ async function start() {
 	 * connected to Web3Socket
 	 */
 	new TransactionSocket().subscribeNewBlock();
-
 	const txRest = new TransactionRest();
-	const networkId = await txRest.getNetworkId();
-	console.log('NETWORK ID:', networkId);
+	await txRest.getNetworkId();
 }
 
 start();
