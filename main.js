@@ -45,6 +45,6 @@ httpServer.on('error', function (err) {
 });
 
 require('./api/app.js');
-require('./api/bridge/index.js');
+
 module.exports = app;
 global.db = require('./db')
