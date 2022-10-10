@@ -17,8 +17,12 @@ async function start() {
 	 */
 	new TransactionSocket().subscribeNewBlock();
 	const txRest = new TransactionRest();
+<<<<<<< HEAD
 	const networkId = await txRest.getNetworkId();
 	logger.debug(`NETWORK ID: ${networkId}`);
+=======
+	await txRest.getNetworkId();
+>>>>>>> master
 }
 
 start();

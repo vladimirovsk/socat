@@ -9,7 +9,7 @@ import errorHandler from './middleware/errorHandler.js';
 import * as  db from './db/index.js'
 import http from 'http';
 const app = express();
-const logger = log4js.getLogger('[SOCAT]');
+const logger = log4js.getLogger('[MAIN]');
 logger.level = process.env.LOG_LEVEL || 'debug';
 
 global.conf = conf;
@@ -45,5 +45,12 @@ httpServer.on('error', function (err) {
 	logger.error('Error, created httpServer', err.message);
 });
 
+<<<<<<< HEAD
 
 global.db = db;
+=======
+require('./api/app.js');
+
+module.exports = app;
+global.db = require('./db')
+>>>>>>> master
