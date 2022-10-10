@@ -7,7 +7,7 @@ class TransactionController {
     async addTransaction(req, res){
         try {
             if (!Boolean(req.id)){
-                throw new AppError('params id not found', 404)
+                throw new AppError('params id not found', HTTP_NOT_FOUND)
             }
             res.status(200).json({status:true})
         }catch (err) {

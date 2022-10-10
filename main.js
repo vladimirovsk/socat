@@ -9,7 +9,7 @@ const errorHandler = require('./middleware/errorHandler.js');
 const http = require('http');
 
 const app = express();
-const logger = log4js.getLogger('[SOCAT]');
+const logger = log4js.getLogger('[MAIN]');
 logger.level = process.env.LOG_LEVEL || 'debug';
 
 global.conf = require('./config');

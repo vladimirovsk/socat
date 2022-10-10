@@ -1,6 +1,45 @@
 version: '3.7'
 services:
-  db:
+  mongo:
+    env_file:
+      - .env
+    image: mongo:latest
+    volumes:
+      - ./mongo-volume:/data/db/mongo
+    ports:
+      - "27017-27019:27017-27019"
+    networks:
+      - backend
+
+  redis:
+    container_name: redis
+    env_file:
+      - .env
+    image: redis:latest
+    restart: always
+    volumes:
+      - $PWD/redis-data:/var/lib/redis
+      - $PWD/redis-conf:/usr/local/etc/redis
+    ports:
+      - '6379:6379'
+    networks:
+      - backend
+
+  redis-commander:
+    env_file:
+      - .env
+    container_name: redis-commander
+    image: rediscommander/redis-commander:latest
+    environment:
+      - REDIS_HOSTS=local:redis:6379
+    ports:
+      - '8071:8081'
+    depends_on:
+      - redis
+    networks:
+      - backend
+
+  postgres:
     container_name: main-db
     image: postgres
     restart: always
@@ -14,6 +53,8 @@ services:
       - ./data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - backend
 
   application:
     build: ./
@@ -24,4 +65,10 @@ services:
       - .env
     ports:
       - "${PORT}:${PORT}"
+    networks:
+      - backend
 
+networks:
+  backend:
+    name: dev_network
+    driver: bridge
