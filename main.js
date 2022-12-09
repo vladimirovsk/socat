@@ -1,50 +1,32 @@
-const createError = require('http-errors');
-const express = require('express');
-const cors = require('cors');
-const router = require('./routes');
-const log4js = require('log4js');
-const normalizePort = require('normalize-port');
-const errorHandler = require('./middleware/errorHandler.js');
+global.conf = require('./config');
+const { rabbitMQClient } = require("./helpers/rabbitMQConnection");
+const log4jsConfig = conf.log4js;
+const log4js = require('log4js').configure(log4jsConfig);
+const app = require('./app');
 
-const http = require('http');
+const { PortChecker } = require("./helpers/portChecker")
 
-const app = express();
+const portChecker = new PortChecker()
+
+const checkHosts = global.conf.checkHostEnabled || [];
+
+checkHosts.map(row =>{
+	portChecker.testPort(row.port, row.host).then((result)=>{
+		logger.info(`Is ${row.host}:${row.port} work: ${result}`);
+	}).catch(err=>{
+		logger.info(`Error open url: ${row.host}:${row.port}`);
+	})
+})
+
 const logger = log4js.getLogger('[MAIN]');
 logger.level = process.env.LOG_LEVEL || 'debug';
-
-global.conf = require('./config');
-
-app.use(cors())
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
-
-app.use(`/api/${process.env.VERSION}`, router);
-app.use(`/api/${process.env.VERSION}/static`, express.static('public'));
-
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-	next(createError(404));
-});
-app.use(errorHandler)
-
-
-const PORT = normalizePort(conf.port || 3000);
-const httpServer = http.createServer(app)
-httpServer.timeout = 60000;
 
 process.on('unhandledRejection', (reason, promise) => {
 	logger.error('Error:', reason.message)
 });
 
-httpServer.listen(PORT, function () {
-	logger.debug(`Server listening on port ${PORT}`)
-})
-
-httpServer.on('error', function (err) {
-	logger.error('Error, created httpServer', err.message);
-});
-
 require('./api/app.js');
+const { config } = require("dotenv");
 
 module.exports = app;
 global.db = require('./db')

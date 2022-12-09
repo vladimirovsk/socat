@@ -1,5 +1,6 @@
 const Web3WsProvider = require('web3-providers-ws');
 const Web3 = require('web3');
+const {rabbitMQClient} = require('../../helpers/rabbitMQConnection');
 const log4js = require('log4js');
 const logger = log4js.getLogger('[WEB3SOCKET]');
 logger.level = process.env.LOG_LEVEL || 'debug';
@@ -28,6 +29,8 @@ module.exports = class TransactionSocket {
 		this.provider_ws.on('connect', function () {
 			logger.debug('WSS connected');
 		});
+
+		rabbitMQClient.subscribe(conf.rabbitMQ.queueName);
 	}
 
 	subscribeSync() {
@@ -41,10 +44,15 @@ module.exports = class TransactionSocket {
 	}
 
 	subscribeNewBlock(topic = 'newBlockHeaders') {
+
 		this.web3ws.eth.subscribe(topic, async (err, res) => {
 			if (!err) {
 				this.web3ws.eth.getBlock(res.number).then(async block => {
+					await rabbitMQClient.sendToQueue(conf.rabbitMQ.queueName, { block }).then(()=>{
+					})
+
 					if (block !== undefined) {
+
 						logger.log(`BLOCK: ${res.number} Transaction:  ${block.transactions}`);
 					}
 				});

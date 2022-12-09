@@ -5,7 +5,7 @@ services:
       - .env
     image: mongo:latest
     volumes:
-      - ./mongo-volume:/data/db/mongo
+      - ./.docker/mongo-volume:/data/db/mongo
     ports:
       - "27017-27019:27017-27019"
     networks:
@@ -18,8 +18,8 @@ services:
     image: redis:latest
     restart: always
     volumes:
-      - $PWD/redis-data:/var/lib/redis
-      - $PWD/redis-conf:/usr/local/etc/redis
+      - ./.docker/redis-data:/var/lib/redis
+      - ./.docker/redis-conf:/usr/local/etc/redis
     ports:
       - '6379:6379'
     networks:
@@ -50,7 +50,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - ./.docker/postgres/data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
@@ -65,6 +65,31 @@ services:
       - .env
     ports:
       - "${PORT}:${PORT}"
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:3.9-management
+    container_name: rabbitmq
+    restart: always
+    env_file:
+      - .env
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
+      RABBITMQ_NODENAME: ${RABBITMQ_NODENAME}
+    # RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbit log [{console,[{level,debug}]}]
+    #    command: [ "bash", "-c", "chmod 400 /var/lib/rabbitmq/.erlang.cookie; rabbitmq-server" ]
+    volumes:
+      - ./.docker/rabbitmq/data/:/var/lib/rabbitmq/
+      - ./.docker/rabbitmq/logs/:/var/log/rabbitmq/
+    ports:
+      - "5671:5671"
+      - "5672:5672"
+      - "15671:15671"
+      - "15672:15672"
     networks:
       - backend
 
